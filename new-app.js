@@ -10,7 +10,7 @@ var addItem = function(state, itemName) {
 }
 
 // Create state-rendering functions
-var renderList = function(state, item) {
+var renderList = function(state, element) {
 	var itemsHTML = state.items.map(function(item) {
 		return '\
 		<li>\
@@ -26,14 +26,14 @@ var renderList = function(state, item) {
         </li>';
 	});
 	console.log(itemsHTML)
-	$(".shopping-list").append(itemsHTML);
+	element.append(itemsHTML);
 };
 
 // Create Event-listeners to fire functions
 $("#js-shopping-list-form").submit(function (event) {
 	event.preventDefault();
 	addItem(state, $("#shopping-list-entry").val());
-	renderList(state, $("#shopping-list-entry").val());
+	renderList(state, $(".shopping-list"));
 	$("#shopping-list-entry").val("");
 	$("#shopping-list-entry").focus();
 });
