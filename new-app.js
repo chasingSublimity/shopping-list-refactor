@@ -3,46 +3,65 @@ var state = {
 	items: []
 };
 
-// Create state-changing functions
+// List item HTML template
+var liTemplate = (
+	'<li>' +
+    '<span class="shopping-item js-shopping-item"></span>' +
+    '<div class="shopping-item-controls">' +
+      '<button class="js-shopping-item-toggle">' +
+        '<span class="button-label">check</span>' +
+      '</button>' +
+      '<button class="js-shopping-item-delete">' +
+        '<span class="button-label">delete</span>' +
+      '</button>' +
+    '</div>' +
+  '</li>'
+)
+
+// State-changing functions
 var addItem = function(state, itemName) {
-	var shoppingItem = {
+	state.items.push({
 		name: itemName,
 		checked: false
-	};
-
-	state.items.push(shoppingItem);
+	});
 };
 
-var checkItem = function() {
+var getItem = function(state, index) {
+	return state.items[index];
+}
 
-};
+var deleteItem = function(state, index) {
+	state.items.slice(index, 1)
+}
+
+var updateItem = function(state, index, newState) {
+	state.items[index] = newState;
+}
+
 
 // Create state-rendering functions
-// var renderList = function(state, element) {
-// 	var itemsHTML = state.items.map(function(item) {
-// 		return '\
-// 		<li>\
-//       <span class="shopping-item">' + item + '</span>\
-//       <div class="shopping-item-controls">\
-//       <button class="shopping-item-toggle">\
-//           <span class="button-label">check</span>\
-//       </button>\
-//       <button class="shopping-item-delete">\
-//           <span class="button-label">delete</span>\
-//       </button>\
-//       </div>\
-//   	</li>';
-// 	});
-// 	element.append(itemsHTML);
-// };
+var buildItem = function (item, id, template, attr) {
+	var listItem = $(template);
+	listItem.find('.js-shopping-item').text(item.name);
+	if (item.checked) {
+		listItem.find('.js-shopping-item').addClass('.js-shopping-item__checked')
+	}
+	
+}
+
+var renderList = function(state, list, attr) {
+	var itemList = state.items.map(
+		function(item, index) {
+			return buildItem(item, index, listItemTemplate, attr);
+		})
+	list.html(itemsHTML);
+};
 
 // Create Event-listeners to fire functions
 $('#js-shopping-list-form').submit(function (event) {
 	event.preventDefault();
 	addItem(state, $('#shopping-list-entry').val());
-	// renderList(state, $('.shopping-list'));
+	renderList(state, $('.shopping-list'));
 	$('#shopping-list-entry').val('');
 	$('#shopping-list-entry').focus();
 });
-
-$('.shopping-list').on('click')
