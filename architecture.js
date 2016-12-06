@@ -15,17 +15,19 @@ function addItem (state, name) {
 	state.items.push(item);
 }
 
-
-// function to remove list-item objects from the items array
-function deleteItem (state, index) {
-	state.items.slice(index, 1);
-}
-
 // function to find index of object in items array
 function getObjectIndex (state, button) {
 	var spanVal = $(button).parents('li').find('.js-shopping-item').html();
 	var itemIndex = state.items.findIndex(function(object) { return object.itemName === spanVal});
 	return itemIndex;
+}
+
+// function to remove list-item objects from the items array
+function deleteItem (state, button) {
+	var index = getObjectIndex(state, button);
+	state.items.splice(index, 1);
+	console.log(index);
+	console.log(state.items);
 }
 
 // function to update objects within items array
@@ -62,35 +64,38 @@ function toggleChecked (state, item, button) {
  		return item;
 	}
 
+	// function to render list items
 	function renderList (state, element) {
 		var items = [];
 		for (i=0;i < state.items.length; i++){
 			item = buildListItem(state.items[i].itemName, state.items[i].checked);
 			items.push(item);
 		}
-		console.log(items);
 		element.html(items);
-	};
+	}
 
-// event listeners to fire functions
-
-
-	// event listener to fire deleteItem function
-
-	// event listener to fire toggleCheckedClass function
 
 // function handlers attached to event listeners within document.ready
 $(document).ready(function() {
+
+	// add shopping item
 	$('#js-shopping-list-form').submit(function (event) {
 		event.preventDefault();
 		addItem(state, $('#shopping-list-entry').val());
 		renderList(state, $('ul.shopping-list'));
 		$('#shopping-list-entry').val('');
     $('#shopping-list-entry').focus();
-	});
+	})
 
+	// check shopping item
 	$(document).on('click', '.js-shopping-item-toggle', function (event) {
 		toggleChecked(state, $(event.target).parents('li').find('.js-shopping-item').html(), $(event.target));
 		renderList(state, $('ul.shopping-list'));
-	}); 
+	})
+
+	// delete shopping item
+	$(document).on('click', '.js-shopping-item-delete', function (event) {
+		deleteItem(state, $(event.target));
+		renderList(state, $('ul.shopping-list'));
+	})
 })
