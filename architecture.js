@@ -22,14 +22,6 @@ function getObjectIndex (state, button) {
 	return itemIndex;
 }
 
-// function to remove list-item objects from the items array
-function deleteItem (state, button) {
-	var index = getObjectIndex(state, button);
-	state.items.splice(index, 1);
-	console.log(index);
-	console.log(state.items);
-}
-
 // function to update objects within items array
 function toggleChecked (state, item, button) {
 	var index = getObjectIndex(state, button);
@@ -40,39 +32,44 @@ function toggleChecked (state, item, button) {
 	}
 }
 
+// function to remove list-item objects from the items array
+function deleteItem (state, button) {
+	var index = getObjectIndex(state, button);
+	state.items.splice(index, 1);
+	console.log(index);
+	console.log(state.items);
+}
 
-// function to render state
+// function to build HTML list items
+function buildListItem (itemName, checked) {
+	var item = $(
+		'<li>' +
+	    '<span class="shopping-item js-shopping-item">' + itemName + '</span>' +
+	    '<div class="shopping-item-controls">' +
+	      '<button class="js-shopping-item-toggle">' +
+	        '<span class="button-label">check</span>' +
+	      '</button>' +
+	      '<button class="js-shopping-item-delete">' +
+	        '<span class="button-label">delete</span>' +
+	      '</button>' +
+	    '</div>' +
+	  '</li>'
+	);
+ 	if (checked) {
+ 		item.find('.js-shopping-item').addClass('shopping-item__checked');
+ 	}
+		return item;
+}
 
-	// function to build HTML list items
-	function buildListItem (itemName, checked) {
-		var item = $(
-			'<li>' +
-		    '<span class="shopping-item js-shopping-item">' + itemName + '</span>' +
-		    '<div class="shopping-item-controls">' +
-		      '<button class="js-shopping-item-toggle">' +
-		        '<span class="button-label">check</span>' +
-		      '</button>' +
-		      '<button class="js-shopping-item-delete">' +
-		        '<span class="button-label">delete</span>' +
-		      '</button>' +
-		    '</div>' +
-		  '</li>'
-		);
-	 	if (checked) {
-	 		item.find('.js-shopping-item').addClass('shopping-item__checked');
-	 	}
- 		return item;
+// function to render list items
+function renderList (state, element) {
+	var items = [];
+	for (i=0;i < state.items.length; i++){
+		item = buildListItem(state.items[i].itemName, state.items[i].checked);
+		items.push(item);
 	}
-
-	// function to render list items
-	function renderList (state, element) {
-		var items = [];
-		for (i=0;i < state.items.length; i++){
-			item = buildListItem(state.items[i].itemName, state.items[i].checked);
-			items.push(item);
-		}
-		element.html(items);
-	}
+	element.html(items);
+}
 
 
 // function handlers attached to event listeners within document.ready
@@ -89,7 +86,7 @@ $(document).ready(function() {
 
 	// check shopping item
 	$(document).on('click', '.js-shopping-item-toggle', function (event) {
-		toggleChecked(state, $(event.target).parents('li').find('.js-shopping-item').html(), $(event.target));
+		toggleChecked(state, $(event.target).parent('li').find('.js-shopping-item').html(), $(event.target));
 		renderList(state, $('ul.shopping-list'));
 	})
 
