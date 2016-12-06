@@ -1,39 +1,51 @@
 // Variable to store application state
-	var state = {
+var state = {
 
-		/* items is an array of objects. The objects are comprised of the shopping item name and a boolean to represent their checked status, 
-		which is false by default */
-		items: []
-	};
+	/* items is an array of objects. The objects are comprised of the shopping item name and a boolean to represent their checked status, 
+	which is false by default */
+	items: []
+}
 
-// functions to modify state
+// function to add list-item objects to items array
+function addItem (state, name) {
+	var item = {
+		itemName: name,
+		checked: false
+	}
+	state.items.push(item);
+}
 
-	// function to add list-item objects to items array
-	var addItem = function(state, name) {
-		var item = {
-			itemName: name,
-			checked: false
-		};
-		state.items.push(item);
-	};
 
-	// function to remove list-item objects from the items array
-	var deleteItem = function(state, index) {
-		state.items.slice(index, 1);
-	};
+// function to remove list-item objects from the items array
+function deleteItem (state, index) {
+	state.items.slice(index, 1);
+}
 
-	// function to update objects within items array
-	var updateItem = function(state, index, newData) {
-		state.items[index] = newData;
-	};
+// function to find index of object in items array
+function getObjectIndex (state, button) {
+	var spanVal = $(button).parents('li').find('.js-shopping-item').html();
+	var itemIndex = state.items.findIndex(function(object) { return object.itemName === spanVal});
+	return itemIndex;
+}
+
+// function to update objects within items array
+function toggleChecked (state, item, button) {
+	var index = getObjectIndex(state, button);
+	if (state.items[index].checked === true) {
+		state.items[index].checked = false;
+	} else {
+		state.items[index].checked = true;
+	}
+}
+
 
 // function to render state
 
 	// function to build HTML list items
-	var renderList = function(state, element) {
-		var liTemplate = $(
+	function buildListItem (itemName, checked) {
+		var item = $(
 			'<li>' +
-		    '<span class="shopping-item js-shopping-item"></span>' +
+		    '<span class="shopping-item js-shopping-item">' + itemName + '</span>' +
 		    '<div class="shopping-item-controls">' +
 		      '<button class="js-shopping-item-toggle">' +
 		        '<span class="button-label">check</span>' +
@@ -44,21 +56,20 @@
 		    '</div>' +
 		  '</li>'
 		);
-		var itemNames = [];
-		for (i=0; i < (state.items).length; i++) {
-			itemNames.push(state.items[i]['itemName']);
-		};
-		var liItems = itemNames.map(function(itemName) {
-			liTemplate.find('.js-shopping-item').text(itemName);
-			return liTemplate;
-		});
-		console.log(liItems);
-		element.html(liItems);
-	};
+	 	if (checked) {
+	 		item.find('.js-shopping-item').addClass('shopping-item__checked');
+	 	}
+ 		return item;
+	}
 
-	// function to toggle shopping-item__checked class
-	var toggleCheckedClass = function() {
-
+	function renderList (state, element) {
+		var items = [];
+		for (i=0;i < state.items.length; i++){
+			item = buildListItem(state.items[i].itemName, state.items[i].checked);
+			items.push(item);
+		}
+		console.log(items);
+		element.html(items);
 	};
 
 // event listeners to fire functions
@@ -70,12 +81,16 @@
 
 // function handlers attached to event listeners within document.ready
 $(document).ready(function() {
-	$("#js-shopping-list-form").submit(function (event) {
+	$('#js-shopping-list-form').submit(function (event) {
 		event.preventDefault();
 		addItem(state, $('#shopping-list-entry').val());
 		renderList(state, $('ul.shopping-list'));
-		$("#shopping-list-entry").val("");
-    $("#shopping-list-entry").focus();
+		$('#shopping-list-entry').val('');
+    $('#shopping-list-entry').focus();
 	});
 
+	$(document).on('click', '.js-shopping-item-toggle', function (event) {
+		toggleChecked(state, $(event.target).parents('li').find('.js-shopping-item').html(), $(event.target));
+		renderList(state, $('ul.shopping-list'));
+	}); 
 })
